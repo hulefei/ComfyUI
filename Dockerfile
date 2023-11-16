@@ -14,5 +14,5 @@ COPY . /app/
 
 RUN pip install -r /app/requirements.txt
 
-CMD [ "python3", "/app/main.py", "--listen --port 7862" ]
+CMD [ "python3", "/app/main.py", "--listen"]
 # CMD echo "Hello World"

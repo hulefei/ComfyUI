@@ -1,0 +1,20 @@
+version: "3.3"
+services:
+  comfyui:
+    container_name: comfyui
+    build:
+      context: .
+    ports:
+      - "7862:8188"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./models/:/app/models
+      - ./output/:/app/output
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]

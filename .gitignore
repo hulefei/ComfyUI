@@ -1,6 +1,6 @@
 __pycache__/
-# output/
-# input/
+output/
+input/
 /models/
 .vs/
 .idea/
