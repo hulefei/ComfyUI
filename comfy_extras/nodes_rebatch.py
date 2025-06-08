@@ -40,7 +40,7 @@ class LatentRebatch:
             return slices, indexable[num * batch_size:]
         else:
             return slices, None
-    
+
     @staticmethod
     def slice_batch(batch, num, batch_size):
         result = [LatentRebatch.get_slices(x, num, batch_size) for x in batch]
@@ -81,7 +81,7 @@ class LatentRebatch:
             if current_batch[0].shape[0] > batch_size:
                 num = current_batch[0].shape[0] // batch_size
                 sliced, remainder = self.slice_batch(current_batch, num, batch_size)
-                
+
                 for i in range(num):
                     output_list.append({'samples': sliced[0][i], 'noise_mask': sliced[1][i], 'batch_index': sliced[2][i]})
 
@@ -99,10 +99,40 @@ class LatentRebatch:
 
         return (output_list,)
 
+class ImageRebatch:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { "images": ("IMAGE",),
+                              "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}),
+                              }}
+    RETURN_TYPES = ("IMAGE",)
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True, )
+
+    FUNCTION = "rebatch"
+
+    CATEGORY = "image/batch"
+
+    def rebatch(self, images, batch_size):
+        batch_size = batch_size[0]
+
+        output_list = []
+        all_images = []
+        for img in images:
+            for i in range(img.shape[0]):
+                all_images.append(img[i:i+1])
+
+        for i in range(0, len(all_images), batch_size):
+            output_list.append(torch.cat(all_images[i:i+batch_size], dim=0))
+
+        return (output_list,)
+
 NODE_CLASS_MAPPINGS = {
     "RebatchLatents": LatentRebatch,
+    "RebatchImages": ImageRebatch,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "RebatchLatents": "Rebatch Latents",
+    "RebatchImages": "Rebatch Images",
 }
